@@ -1,0 +1,241 @@
+---
+title: "Explore DESeq2 Results"
+author: "Tamas Schauer"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  \usepackage[utf8]{inputenc}
+---
+
+<style>
+pre {
+  overflow-x: auto;
+}
+pre code {
+  word-wrap: normal;
+  white-space: pre;
+}
+</style>
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+## Load Example Results
+
+```{r}
+library(HelpersforDESeq2)
+
+data_dir <- system.file("extdata/", package = "HelpersforDESeq2")
+
+res_files <- file.path(data_dir, list.files(path = data_dir, pattern = "^res\\."))
+
+for(i in seq_along(res_files)){
+        
+        res_name <- gsub(".txt","",gsub(".*res.","res.", res_files[i]))
+        res_tmp <- read.delim(res_files[i], row.names = 1, stringsAsFactors = F)
+        
+        assign(res_name, res_tmp)
+
+}
+
+res_names <- ls(pattern = "^res\\.")
+
+head(res_names)
+
+head(get(res_names[1]))
+```
+
+
+## Load Transcripts of Interest
+
+```{r message=FALSE, warning=FALSE,results=F}
+snoRNA_snopy <- read.table(file.path(data_dir, "snoRNA_snopy.txt"), 
+                           header = T, sep = "\t", stringsAsFactors = FALSE)
+
+mito_genes <- get(res_names[1])$gene_symbol[get(res_names[1])$chr %in% c("mitochondrion_genome")]
+```
+
+
+
+## MA Plot
+
+```{r message=FALSE, warning=FALSE,results=F, fig.align='center', fig.height=7, fig.width=7, dpi=200, out.width='75%'}
+par(mfrow=c(2,2), mar = c(4,4,2,2), oma = c(1,1,1,1), mgp = c(2,1,0))
+
+for(res_name in res_names[c(2,3,1,4)]){
+        
+        plottingMA(res = get(res_name),
+                   main_title = gsub("res.","",res_name),
+                   selection_ids = c("roX1","roX2"),
+                   selection_id_type = "gene_symbol",
+                   selection_point_size = 0.75,
+                   selection_text_label = TRUE,
+                   selection_shadow = FALSE,
+                   xlims = c(0, 6),
+                   ylims = c(-10,10),
+                   x_axis_by = 2,
+                   padj_cutoff = 0.01,
+                   show_legend = TRUE)
+}
+
+```
+        
+
+```{r message=FALSE, warning=FALSE,results=T, fig.align='center', fig.height=6, fig.width=6, dpi=200, out.width='75%'}
+par(mfrow=c(1,1), mar = c(4,4,2,2), oma = c(4,4,4,4), mgp = c(2,1,0))
+
+res_name <- "res.HighMLEpATP-HighMLEmATP"
+
+# alternative colors
+plottingMA(res =  get(res_name),
+           main_title = gsub("res.","",res_name),
+           point_color = rgb(0,0,0,0.2), 
+           sign_point_color = rgb(0.8,0,0,0.5),
+           selection_point_color = rgb(0.7,0.7,0.7),
+           selection_sign_point_color = rgb(0.9,0.6,0), 
+           selection_ids = c("roX1","roX2"),
+           selection_id_type = "gene_symbol",
+           selection_point_size = 1,
+           selection_text_label = TRUE,
+           selection_shadow = TRUE,
+           xlims = c(0, 6),
+           ylims = c(-10,10),
+           x_axis_by = 2,
+           padj_cutoff = 0.01,
+           show_legend = TRUE)
+```
+
+## Density Plot of log2FC
+
+```{r message=FALSE, warning=FALSE,results=F, fig.align='center', fig.height=7, fig.width=7, dpi=200, out.width='75%'}
+par(mfrow=c(2,2), mar = c(4,4,2,2), oma = c(1,1,1,1), mgp = c(2,1,0))
+
+for(res_name in res_names[c(2,3)]){
+        
+        plotDens(res = get(res_name),
+                 main_title = gsub("res.","",res_name),
+                 selection_ids = mito_genes,
+                 selection_id_type = "gene_symbol",
+                 selection_color = rgb(0.1,0.1,0.9,1),
+                 selection_legend = "Mito Genes",
+                 xlims = c(-6,6),
+                 ylims = c(0,1),
+                 x_label = "log2FC")
+}
+
+res_name = "res.LowMLEpATP-LowMLEmATP"
+
+for(tx_type in c("H/ACA", "C/D")){
+        
+        plotDens(res = get(res_name),
+                 main_title = gsub("res.","",res_name),
+                 selection_ids = snoRNA_snopy$snoRNA.name[snoRNA_snopy$Box == tx_type],
+                 selection_id_type = "gene_symbol",
+                 selection_color = rgb(0.7,0,0.9,1),
+                 selection_legend = tx_type,
+                 xlims = c(-6,6),
+                 ylims = c(0,1.2),
+                 x_label = "log2FC") 
+}
+```
+
+
+## log2FC - log2FC Plot
+
+```{r message=FALSE, warning=FALSE,results=F, fig.align='center', fig.height=7, fig.width=7, dpi=200, out.width='75%'}
+par(mfrow=c(2,2), mar = c(5,5,1,1), oma = c(1,1,1,1), mgp = c(3,1,0))
+
+res1_name = "res.HighMLEpATP-Input"
+res2_name = "res.LowMLEpATP-Input"
+
+plotLog2FC(res1 = get(res1_name),
+           res2 = get(res2_name),
+           main_title = "",
+           x_label = paste("log2FC \n", gsub("res.","",res1_name)),
+           y_label = paste("log2FC \n", gsub("res.","",res2_name)),
+           lims = c(-6,6),
+           point_size = 0.25,
+           selection_ids = c("roX1","roX2"),
+           selection_id_type = "gene_symbol",
+           selection_point_size = 1,
+           selection_legend = NULL,
+           selection_text_label = TRUE) 
+
+plotLog2FC(res1 = get(res1_name),
+           res2 = get(res2_name),
+           main_title = "",
+           x_label = paste("log2FC \n", gsub("res.","",res1_name)),
+           y_label = paste("log2FC \n", gsub("res.","",res2_name)),
+           lims = c(-6,6),
+           point_size = 0.25,
+           selection_ids = mito_genes,
+           selection_id_type = "gene_symbol",
+           selection_color = rgb(0.1,0.1,0.9,1),
+           selection_point_size = 1,
+           selection_legend = "Mito Genes",
+           selection_text_label = FALSE) 
+
+
+res1_name = "res.HighMLEpATP-HighMLEmATP"
+res2_name = "res.LowMLEpATP-LowMLEmATP"
+
+for(tx_type in c("H/ACA", "C/D")){
+        
+        plotLog2FC(res1 = get(res1_name),
+                   res2 = get(res2_name),
+                   main_title = "",
+                   x_label = paste("log2FC \n", gsub("res.","",res1_name)),
+                   y_label = paste("log2FC \n", gsub("res.","",res2_name)),
+                   lims = c(-6,6),
+                   point_size = 0.25,
+                   selection_ids = snoRNA_snopy$snoRNA.name[snoRNA_snopy$Box == tx_type],
+                   selection_id_type = "gene_symbol",
+                   selection_color = rgb(0.7,0,0.9,1),
+                   selection_point_size = 0.5,
+                   selection_legend = tx_type,
+                   selection_text_label = FALSE) 
+}
+
+
+```
+
+
+## Gene Ontology
+
+```{r message=FALSE, warning=FALSE,results=T, fig.align='center', fig.height=10, fig.width=10, dpi=200, out.width='75%'}
+library(topGO)
+library(org.Dm.eg.db)
+
+res_name = "res.HighMLEpATP-Input"
+
+all_genes <- factor(as.integer(get(res_name)$padj < 0.01 & get(res_name)$log2FoldChange > 1.25))
+names(all_genes) <- mapIds(x = org.Dm.eg.db, keys = rownames(get(res_name)), keytype = "FLYBASE", column = "SYMBOL")
+
+head(all_genes,10)
+
+gt <- makeGOTable(all_genes = all_genes,
+                  shown_terms = 20,
+                  min_signficant = 5,
+                  select_ontology = "CC",
+                  select_organism = "org.Dm.eg.db",
+                  select_ID = "SYMBOL")
+
+
+gt[1:5,]
+
+
+plotGObBubbles(gt = gt, 
+               main_title = gsub("res.","", res_name))
+
+```
+
+```{r}
+sessionInfo()
+```
+
+
+
