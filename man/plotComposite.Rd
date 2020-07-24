@@ -17,7 +17,7 @@ plotComposite(
   line_lwd = 2,
   smoother = 11,
   log_scale = FALSE,
-  show_error = TRUE
+  add_range = c(NULL, "SD", "SEM", "CI", "IQR")
 )
 }
 \description{

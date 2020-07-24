@@ -19,14 +19,14 @@ plotComposite <- function(my_sample_mats,
                           line_lwd = 2,
                           smoother = 11,
                           log_scale = FALSE,
-                          show_error = TRUE){
+                          add_range = c(NULL, "SD","SEM", "CI","IQR")){
 
 
-        x_range <- ncol(get(my_sample_mats[1], envir = .GlobalEnv)[,my_sub_range])
-        y_data <- colMeans(get(my_sample_mats[1], envir = .GlobalEnv), na.rm = TRUE)[my_sub_range]
+        x_range <- ncol(get(my_sample_mats[1])[,my_sub_range])
 
 
-        plot(1:x_range, y_data, xaxt = "n", yaxt = yaxt,
+        plot(1:x_range,
+             xaxt = "n", yaxt = yaxt,
              main = my_title, xlab = "", ylab = "",
              type="n", ylim = ylims)
 
@@ -52,20 +52,45 @@ plotComposite <- function(my_sample_mats,
                 }
 
                 x_range <- ncol(my_sample_mat)
-                y_data <- colMeans(my_sample_mat)
-
-                my_yerror <- apply(my_sample_mat, 2, function(x){ qt(0.975, df = length(x)-1)*sd(x, na.rm = TRUE)/sqrt(length(x)) })
-
+                y_data <- colMeans(my_sample_mat, na.rm = TRUE)
                 y_data <- zoo::rollmean(y_data, smoother)
-                my_yerror <- zoo::rollmean(my_yerror, smoother)
 
 
-                xx <- c(((smoother-1)/2+1):(x_range-((smoother-1)/2)), (x_range-((smoother-1)/2)):((smoother-1)/2+1))
-                yy <- c(y_data-my_yerror, rev(y_data+my_yerror))
+                if(!(is.null(add_range))){
 
-                if(show_error){
+                        if(add_range == "SD"){
+                                my_yerror1 <- apply(my_sample_mat, 2, function(x){sd(x, na.rm = TRUE)})
+                                my_yerror2 <- my_yerror1
+                        }
+
+                        if(add_range == "SEM"){
+                                my_yerror1 <- apply(my_sample_mat, 2, function(x){sd(x, na.rm = TRUE)/sqrt(length(x))})
+                                my_yerror2 <- my_yerror1
+                        }
+
+
+                        if(add_range == "CI"){
+                                my_yerror1 <- apply(my_sample_mat, 2, function(x){qt(0.975, df = length(x)-1)*sd(x, na.rm = TRUE)/sqrt(length(x))})
+                                my_yerror2 <- my_yerror1
+                        }
+
+                        if(add_range == "IQR"){
+                                my_yerror1 <- apply(my_sample_mat, 2, function(x){quantile(x, prob = 0.25,na.rm = TRUE)})
+                                my_yerror2 <- apply(my_sample_mat, 2, function(x){quantile(x, prob = 0.75,na.rm = TRUE)})
+                        }
+
+
+
+                        my_yerror1 <- zoo::rollmean(my_yerror1, smoother)
+                        my_yerror2 <- zoo::rollmean(my_yerror2, smoother)
+
+                        yy <- c(y_data-my_yerror1, rev(y_data+my_yerror2))
+
+
+                        xx <- c(((smoother-1)/2+1):(x_range-((smoother-1)/2)), (x_range-((smoother-1)/2)):((smoother-1)/2+1))
                         polygon(xx, yy, border = NA, col = paste(my_colors_composite[i], "55",sep=""))
                 }
+
 
 
                 lines(((smoother-1)/2+1):(x_range-((smoother-1)/2)), y_data, col = my_colors_composite[i], lwd=line_lwd)
@@ -74,7 +99,7 @@ plotComposite <- function(my_sample_mats,
         }
 
         if(add_line){
-                abline(h = c(min(y_data) , max(y_data)), lty=2)
+                abline(h = c(min(y_data, na.rm = TRUE) , max(y_data, na.rm = TRUE)), lty=2)
         }
 
 }

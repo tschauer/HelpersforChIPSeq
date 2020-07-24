@@ -9,7 +9,7 @@ install_github("tschauer/HelpersforChIPSeq")
 
 ### Documentation
 
-[**Composite Plots**](https://htmlpreview.github.io/?https://github.com/tschauer/HelpersforChIPSeq/blob/master/doc/ChIPseq_Plots.html)
+[**Composite Plots**](https://htmlpreview.github.io/?https://github.com/tschauer/HelpersforChIPSeq/blob/master/doc/ChIPseq_CompositePlot.html)
 
 
 ### Tutorials
