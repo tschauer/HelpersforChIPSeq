@@ -23,6 +23,9 @@ pre code {
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+* ChIP-seq data using H2Av antibody in Drosophila
+* 2 replicates
+* 2 different normalization methods for fun
 
 ## Setup Annotation
 

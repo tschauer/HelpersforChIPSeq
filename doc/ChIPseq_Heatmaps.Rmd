@@ -1,0 +1,192 @@
+---
+title: "ChIPseq Heatmaps"
+author: "Tamas Schauer"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{ChIPseq Heatmaps}
+  %\VignetteEngine{knitr::rmarkdown}
+  \usepackage[utf8]{inputenc}
+---
+
+<style>
+pre {
+  overflow-x: auto;
+}
+pre code {
+  word-wrap: normal;
+  white-space: pre;
+}
+</style>
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+* ChIP-seq data using H2Av antibody in Drosophila
+* 2 replicates
+* 2 different normalization methods for fun
+
+## Setup Data
+
+```{r message=FALSE, warning=FALSE,results=FALSE}
+library(HelpersforChIPSeq)
+```
+
+```{r}
+data_dir <- system.file("extdata/", package = "HelpersforChIPSeq")
+
+my_mats <- file.path(data_dir ,list.files(path = data_dir, pattern = "^mat"))
+
+for(i in seq_along(my_mats)){
+        
+        load(my_mats[i])
+}
+
+my_mats <- ls(pattern = "^mat")
+my_mats
+ 
+# Note: these matrices were binned with a size of 10
+# see composite plot tutorial how to generate matrices
+my_binning <- 10
+
+# they correspond to TSS +/- 2000 bp
+dim(get(my_mats[1]))
+
+# check whether row names are identical in all matrices
+all(sapply(seq_along(my_mats), function(i){(identical(rownames(get(my_mats[length(my_mats)])), rownames(get(my_mats[i]))))}))
+
+# example rows and columns
+get(my_mats[1])[1:5,201:210] 
+```
+
+```{r message=FALSE}
+library(matrixStats)
+
+# order by row average signal
+my_order <- order(rowMeans(averageMats(my_mats)), decreasing = T)
+
+orderMats(my_mats = my_mats,
+          my_order = my_order)
+
+# example rows and columns
+get(my_mats[1])[1:5,201:210]
+
+
+# filter out TSSs with "flat" signal 
+# row standard deviation is higher than a threshold
+my_filter <- rowSds(averageMats(my_mats)) > 0.25
+
+# order function can be used for filtering as well
+orderMats(my_mats = my_mats,
+          my_order = my_filter)
+
+dim(get(my_mats[1]))
+```
+
+
+## Heatmaps
+
+```{r message=FALSE, warning=FALSE,results=FALSE, fig.align='center', fig.height=7, fig.width=7, dpi=200, out.width='75%'}
+library(RColorBrewer)
+
+# setup names and titles
+my_site_name <- "TSS"
+my_sample_names <- gsub("\\.","\n",gsub(paste0(".*", my_site_name, "."),"",my_mats))
+
+# plot heatmaps
+plotHeatmap(my_sample_mats = my_mats, 
+            my_sample_names = my_sample_names,
+            my_site_name = my_site_name,
+            my_binning = my_binning)
+```
+
+
+```{r message=FALSE, warning=FALSE,results=FALSE, fig.align='center', fig.height=7, fig.width=7, dpi=200, out.width='75%'}
+# change contrast
+plotHeatmap(my_sample_mats = my_mats, 
+            my_sample_names = my_sample_names,
+            my_site_name = my_site_name,
+            my_binning = my_binning, 
+            min_value = 2,
+            max_value = 4)
+
+```
+
+```{r message=FALSE, warning=FALSE,results=FALSE, fig.align='center', fig.height=7, fig.width=7, dpi=200, out.width='75%'}
+# change color 
+plotHeatmap(my_sample_mats = my_mats, 
+            my_sample_names = my_sample_names,
+            my_site_name = my_site_name,
+            my_binning = my_binning,
+            my_colors = colorRampPalette(c("white","orange","red","black"))(100))
+```
+
+
+```{r message=FALSE, warning=FALSE,results=FALSE, fig.align='center', fig.height=7, fig.width=7, dpi=200, out.width='75%'}
+# add some smoothing (odd number)
+# Note: smoothing is on top of the binning (whcih was done before this session)
+plotHeatmap(my_sample_mats = my_mats, 
+            my_sample_names = my_sample_names,
+            my_site_name = my_site_name,
+            my_binning = my_binning, 
+            my_colors = colorRampPalette(c("white","orange","red","black"))(100), 
+            smoother = 11)
+```
+
+
+
+```{r message=FALSE}
+### re-order matrices based on average signal 500 bp downstream of the center
+my_order <- order(rowMeans(averageMats(my_mats)[,201:250]), decreasing = T)
+
+orderMats(my_mats = my_mats,
+          my_order = my_order)
+```
+
+
+```{r message=FALSE, warning=FALSE,results=FALSE, fig.align='center', fig.height=7, fig.width=7, dpi=200, out.width='75%'}
+# plot re-ordered heatmaps
+plotHeatmap(my_sample_mats = my_mats, 
+            my_sample_names = my_sample_names,
+            my_site_name = my_site_name, 
+            my_binning = my_binning, 
+            my_colors = colorRampPalette(c("white","orange","red","black"))(100), 
+            smoother = 11)
+```
+
+
+```{r message=FALSE}
+### kmeans clustering
+k <- 6
+km <- kmeans(averageMats(my_mats), centers = k)
+my_order <- unlist(sapply(1:k, function(i){which(names(km$cluster) %in% names(km$cluster)[km$cluster == i])}))
+
+orderMats(my_mats = my_mats,
+          my_order = my_order)
+```
+
+```{r message=FALSE, warning=FALSE,results=FALSE, fig.align='center', fig.height=7, fig.width=7, dpi=200, out.width='75%'}
+# plot clustered heatmaps
+plotHeatmap(my_sample_mats = my_mats, 
+            my_sample_names = my_sample_names,
+            my_site_name = my_site_name, 
+            my_binning = my_binning, 
+            my_colors = colorRampPalette(c("white","orange","red","black"))(100), 
+            smoother = 11)
+```
+
+
+```{r message=FALSE, warning=FALSE,results=FALSE, fig.align='center', fig.height=7, fig.width=7, dpi=200, out.width='75%'}
+# save heatmap as png
+png("heatmaps.TSS.png", height = 7, width = 7, units = "in", res = 200)
+
+plotHeatmap(my_sample_mats = my_mats, 
+            my_sample_names = my_sample_names,
+            my_site_name = my_site_name, 
+            my_binning = my_binning, 
+            my_colors = colorRampPalette(c("white","orange","red","black"))(100), 
+            smoother = 11)
+
+dev.off()
+```
