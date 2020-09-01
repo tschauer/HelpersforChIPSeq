@@ -11,7 +11,7 @@ install_github("tschauer/HelpersforChIPSeq")
 
 [**Composite Plots**](https://htmlpreview.github.io/?https://github.com/tschauer/HelpersforChIPSeq/blob/master/doc/ChIPseq_CompositePlot.html)
 
-[**Heatmaps**](https://htmlpreview.github.io/?https://github.com/tschauer/HelpersforChIPSeq/blob/master/doc/ChIPseq_Heatmapst.html)
+[**Heatmaps**](https://htmlpreview.github.io/?https://github.com/tschauer/HelpersforChIPSeq/blob/master/doc/ChIPseq_Heatmaps.html)
 
 
 ### Tutorials
