@@ -1,0 +1,185 @@
+---
+title: "Working with Centered ChIP Coverage Matrices"
+author: "Tamas Schauer"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Working with Centered ChIP Coverage Matrices}
+  %\VignetteEngine{knitr::rmarkdown}
+  \usepackage[utf8]{inputenc}
+---
+
+<style>
+pre {
+  overflow-x: auto;
+}
+pre code {
+  word-wrap: normal;
+  white-space: pre;
+}
+</style>
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+* ChIP-seq data using H2Av antibody in Drosophila
+* Coverages are centered at transcription start sites (TSS)
+* See code to generate them at the composite plot documentation
+* Subset, plot and summarize such matrices
+
+## Setup Data
+
+```{r message=FALSE, warning=FALSE,results=FALSE}
+library(HelpersforChIPSeq)
+```
+
+```{r}
+data_dir <- system.file("extdata/", package = "HelpersforChIPSeq")
+
+my_mats <- file.path(data_dir ,list.files(path = data_dir, pattern = "^mat"))
+
+for(i in seq_along(my_mats)){
+        
+        load(my_mats[i])
+}
+
+my_mats <- ls(pattern = "^mat")
+my_mats
+ 
+# Note: these matrices were binned with a size of 10
+# See composite plot tutorial how to generate matrices
+my_binning <- 10
+
+# get one of the matrices as example
+my_mat <- get(my_mats[4])
+
+# matrix dimensions correspond to TSS +/- 2000 bp
+dim(my_mat)
+
+# example rows and columns
+my_mat[1:5,201:210] 
+```
+
+
+## Row of the matrix
+
+```{r message=FALSE, warning=FALSE,resultsTRUE, fig.align='center', fig.height=7, fig.width=7, dpi=200, out.width='75%'}
+# select example row
+my_mat_row <- my_mat[rownames(my_mat) == "FBgn0031282",]
+
+length(my_mat_row)
+
+# plot example row
+plot(my_mat_row, type="l")
+
+# draw center line
+abline(v = (length(my_mat_row)+1)/2, lty=2)
+```
+
+```{r message=FALSE, warning=FALSE,results=TRUE, fig.align='center', fig.height=7, fig.width=7, dpi=200, out.width='75%'}
+# smooth example row
+my_mat_row_smooth <- zoo::rollmean(my_mat_row, 11)
+
+# note length shortening
+length(my_mat_row_smooth)
+
+plot(my_mat_row_smooth, type="l")
+
+# new center
+abline(v = (length(my_mat_row_smooth)+1)/2, lty=2)
+```
+
+## Filtering
+
+```{r message=FALSE}
+# filter based on row standard deviation
+# "flat" rows get removed
+library(matrixStats)
+
+my_filter <- rowSds(my_mat) > 0.25
+my_mat <- my_mat[my_filter,]
+
+dim(my_mat)
+```
+
+## Average matrix
+
+
+```{r message=FALSE, warning=FALSE,results=FALSE, fig.align='center', fig.height=7, fig.width=7, dpi=200, out.width='75%'}
+# plot average matrix
+plot(colMeans(my_mat), type="l")
+
+# subset central 1000 bp
+plot(colMeans(my_mat[,151:250]), type="l")
+```
+
+
+
+## Ordering / sorting
+
+```{r message=FALSE}
+# take row average of a subset (500 bp downstream of the center)
+row_ave <- rowMeans(my_mat[,201:250])
+
+# take decreasing order of the averages 
+my_order <- order(row_ave, decreasing = T)
+
+# sort/order matrix based on these averages
+my_mat <- my_mat[my_order,]
+
+# new order
+my_mat[1:5,201:210]
+```
+
+## Simple heatmap
+
+```{r message=FALSE, warning=FALSE,results=FALSE, fig.align='center', fig.height=7, fig.width=4, dpi=200, out.width='50%'}
+# image of the matrix
+# Note matrix is transposed and flipped
+image(my_mat, 
+      useRaster = TRUE)
+
+# correct for proper orientation
+image(t(my_mat)[,nrow(my_mat):1], 
+      useRaster = TRUE)
+
+# set color palette
+library(RColorBrewer)
+my_colors <- colorRampPalette(c("white","orange","red","black"))(100)
+
+# set contrast with minumum and max values
+# Note: do not do calculations on such modified matrix
+min_value <- 1
+max_value <- 7
+
+my_mat[my_mat < min_value] <- min_value
+my_mat[my_mat > max_value] <- max_value
+
+# set color breaks based on new values
+my_breaks <- seq(min(min_value), max(max_value), length.out = 101)
+
+image(t(my_mat)[,nrow(my_mat):1],
+      col = my_colors,
+      breaks =  my_breaks,
+      useRaster = TRUE)
+```
+
+
+```{r message=FALSE, warning=FALSE,results=FALSE, fig.align='center', fig.height=2, fig.width=4, dpi=200, out.width='50%'}
+# generate own color key
+image(matrix(seq_along(my_colors)), 
+      col = my_colors, 
+      axes=FALSE, useRaster = TRUE)
+
+axis(side = 1, at = c(0,0.5,1), 
+     labels = round(my_breaks[c(1,51,101)],1))
+```
+
+* All this code was wrapped in helper functions 
+* See heatmap documentation
+
+
+```{r}
+sessionInfo()
+```

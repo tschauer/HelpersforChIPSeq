@@ -47,7 +47,7 @@ my_mats <- ls(pattern = "^mat")
 my_mats
  
 # Note: these matrices were binned with a size of 10
-# see composite plot tutorial how to generate matrices
+# See composite plot tutorial how to generate matrices
 my_binning <- 10
 
 # they correspond to TSS +/- 2000 bp
@@ -189,4 +189,8 @@ plotHeatmap(my_sample_mats = my_mats,
             smoother = 11)
 
 dev.off()
+```
+
+```{r}
+sessionInfo()
 ```

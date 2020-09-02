@@ -10,7 +10,7 @@ plotHeatmap <- function(my_sample_mats,
                         font_size = 0.75,
                         my_colors = colorRampPalette(brewer.pal(9, "Blues"))(100),
                         min_value = 1,
-                        max_value = 5,
+                        max_value = 7,
                         my_binning = 10,
                         smoother = 1){
 
