@@ -1,10 +1,10 @@
 ---
-title: "Working with Centered ChIP Coverage Matrices"
+title: "Working with Centered Coverage Matrices"
 author: "Tamas Schauer"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Working with Centered ChIP Coverage Matrices}
+  %\VignetteIndexEntry{Working with Centered Coverage Matrices}
   %\VignetteEngine{knitr::rmarkdown}
   \usepackage[utf8]{inputenc}
 ---

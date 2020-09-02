@@ -16,7 +16,7 @@ install_github("tschauer/HelpersforChIPSeq")
 
 ### Tutorials
 
-[**Working with Centered ChIP Coverage Matrices**](https://htmlpreview.github.io/?https://github.com/tschauer/HelpersforChIPSeq/blob/master/doc/Coverage_Matrices.html)
+[**Working with Centered Coverage Matrices**](https://htmlpreview.github.io/?https://github.com/tschauer/HelpersforChIPSeq/blob/master/doc/Coverage_Matrices.html)
 
 
 ### Note
