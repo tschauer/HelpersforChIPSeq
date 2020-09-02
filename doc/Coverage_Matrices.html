@@ -436,7 +436,7 @@ pre code {
 <a class="sourceLine" id="cb22-2" data-line-number="2"><span class="kw">library</span>(RColorBrewer)</a>
 <a class="sourceLine" id="cb22-3" data-line-number="3">my_colors &lt;-<span class="st"> </span><span class="kw">colorRampPalette</span>(<span class="kw">c</span>(<span class="st">&quot;white&quot;</span>,<span class="st">&quot;orange&quot;</span>,<span class="st">&quot;red&quot;</span>,<span class="st">&quot;black&quot;</span>))(<span class="dv">100</span>)</a>
 <a class="sourceLine" id="cb22-4" data-line-number="4"></a>
-<a class="sourceLine" id="cb22-5" data-line-number="5"><span class="co"># set contrast with minumum and max values</span></a>
+<a class="sourceLine" id="cb22-5" data-line-number="5"><span class="co"># set contrast with min and max values</span></a>
 <a class="sourceLine" id="cb22-6" data-line-number="6"><span class="co"># Note: do not do calculations on such modified matrix</span></a>
 <a class="sourceLine" id="cb22-7" data-line-number="7">min_value &lt;-<span class="st"> </span><span class="dv">1</span></a>
 <a class="sourceLine" id="cb22-8" data-line-number="8">max_value &lt;-<span class="st"> </span><span class="dv">7</span></a>
@@ -444,7 +444,7 @@ pre code {
 <a class="sourceLine" id="cb22-10" data-line-number="10">my_mat[my_mat <span class="op">&lt;</span><span class="st"> </span>min_value] &lt;-<span class="st"> </span>min_value</a>
 <a class="sourceLine" id="cb22-11" data-line-number="11">my_mat[my_mat <span class="op">&gt;</span><span class="st"> </span>max_value] &lt;-<span class="st"> </span>max_value</a>
 <a class="sourceLine" id="cb22-12" data-line-number="12"></a>
-<a class="sourceLine" id="cb22-13" data-line-number="13"><span class="co"># set color breaks based on new values</span></a>
+<a class="sourceLine" id="cb22-13" data-line-number="13"><span class="co"># set color breaks (steps) based on set values</span></a>
 <a class="sourceLine" id="cb22-14" data-line-number="14">my_breaks &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="kw">min</span>(min_value), <span class="kw">max</span>(max_value), <span class="dt">length.out =</span> <span class="dv">101</span>)</a>
 <a class="sourceLine" id="cb22-15" data-line-number="15"></a>
 <a class="sourceLine" id="cb22-16" data-line-number="16"><span class="kw">image</span>(<span class="kw">t</span>(my_mat)[,<span class="kw">nrow</span>(my_mat)<span class="op">:</span><span class="dv">1</span>],</a>

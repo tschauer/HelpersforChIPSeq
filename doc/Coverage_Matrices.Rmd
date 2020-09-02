@@ -148,7 +148,7 @@ image(t(my_mat)[,nrow(my_mat):1],
 library(RColorBrewer)
 my_colors <- colorRampPalette(c("white","orange","red","black"))(100)
 
-# set contrast with minumum and max values
+# set contrast with min and max values
 # Note: do not do calculations on such modified matrix
 min_value <- 1
 max_value <- 7
@@ -156,7 +156,7 @@ max_value <- 7
 my_mat[my_mat < min_value] <- min_value
 my_mat[my_mat > max_value] <- max_value
 
-# set color breaks based on new values
+# set color breaks (steps) based on set values
 my_breaks <- seq(min(min_value), max(max_value), length.out = 101)
 
 image(t(my_mat)[,nrow(my_mat):1],
