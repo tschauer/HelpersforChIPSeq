@@ -1,6 +1,10 @@
 #' orderMats
 #'
 #' order or filter matrices by a vector
+#'
+#' @param my_mats Character vector of matrix names.
+#' @param my_order Integer vector of the matrix row order.
+#'
 #' @export
 
 

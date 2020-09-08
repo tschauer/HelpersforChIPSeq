@@ -6,6 +6,11 @@
 \usage{
 orderMats(my_mats, my_order = 1:nrow(get(my_mats[1])))
 }
+\arguments{
+\item{my_mats}{Character vector of matrix names.}
+
+\item{my_order}{Integer vector of the matrix row order.}
+}
 \description{
 order or filter matrices by a vector
 }

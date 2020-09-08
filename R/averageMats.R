@@ -1,6 +1,9 @@
 #' averageMats
 #'
 #' average matrices
+#'
+#' @param my_mats Character vector of matrix names.
+#'
 #' @export
 
 

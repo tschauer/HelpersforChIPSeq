@@ -132,7 +132,7 @@ parallel::mclapply(seq_along(my_covs), mc.cores = 4, FUN = function(i){
                                                   window.size = my_window_size,
                                                   coverage = my_cov)
         
-        my_mat <- bin.matrix.rows(my_mat, my_binning)
+        my_mat <- binMeansMatrix(my_mat, my_binning)
         
         assign(my_name, my_mat)
         save(list = my_name, file = paste(data_dir, my_name, ".rda", sep=""))

@@ -6,6 +6,9 @@
 \usage{
 averageMats(my_mats)
 }
+\arguments{
+\item{my_mats}{Character vector of matrix names.}
+}
 \description{
 average matrices
 }
