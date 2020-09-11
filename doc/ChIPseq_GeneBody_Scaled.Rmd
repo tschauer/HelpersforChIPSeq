@@ -128,7 +128,7 @@ axisGeneBodyScaled(margin_outer = margin_outer,
 # save plot as png
 png("genebody.png", height = 5, width = 5, units = "in", res = 200)
 
-par(mfrow=c(1,1), mar = c(4,4,2,2), oma = c(2,2,2,2), mgp = c(2,1,0))
+par(mfrow=c(1,1), mar = c(4,4,2,2), oma = c(3,2,3,2), mgp = c(2,1,0))
 
 plotComposite(my_sample_mats = my_mat, 
               my_sub_range = 1:ncol(get(my_mat)), 
