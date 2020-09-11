@@ -124,6 +124,32 @@ axisGeneBodyScaled(margin_outer = margin_outer,
 ```
 
 
+```{r message=FALSE, warning=FALSE,results=FALSE, fig.align='center', fig.height=7, fig.width=7, dpi=200, out.width='75%'}
+# save plot as png
+png("genebody.png", height = 5, width = 5, units = "in", res = 200)
+
+par(mfrow=c(1,1), mar = c(4,4,2,2), oma = c(2,2,2,2), mgp = c(2,1,0))
+
+plotComposite(my_sample_mats = my_mat, 
+              my_sub_range = 1:ncol(get(my_mat)), 
+              ylims =  c(0.5,2.5), 
+              my_binning = 1, 
+              my_colors_composite = "#0072B2", 
+              my_title = gsub("mat.","",my_mat),
+              add_range = NULL, 
+              smoother = 31, 
+              line_lwd = 2, 
+              add_axis = FALSE)  
+
+mtext(text = "ChIP / Input", side = 2, line = 2.5)
+
+axisGeneBodyScaled(margin_outer = margin_outer,
+                   margin_inner = margin_inner,
+                   genebody_scaler = genebody_scaler,
+                   add_line = TRUE)
+
+dev.off()
+```
 
 ```{r message=FALSE, warning=FALSE,results=FALSE, fig.align='center', fig.height=5, fig.width=5, dpi=200, out.width='75%'}
 # change inner margins
