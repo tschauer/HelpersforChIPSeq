@@ -15,7 +15,7 @@ binMeansMatrix(my_mat, my_binning = 10)
 output matrix with original number of rows and \code{my_binning} times less number of columns.
 }
 \description{
-calculate the mean of non-overlapping bins for each row in a matrix.
+calculates the mean of non-overlapping bins for each row in a matrix.
 }
 \examples{
 m <- matrix(1:100, ncol=10)

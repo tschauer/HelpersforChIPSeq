@@ -1,0 +1,174 @@
+---
+title: "ChIPseq GeneBody Scaled Matrix"
+author: "Tamas Schauer"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{ChIPseq GeneBody Scaled Matrix}
+  \usepackage[utf8]{inputenc}
+  %\VignetteEngine{knitr::rmarkdown}
+editor_options: 
+  chunk_output_type: inline
+---
+
+<style>
+pre {
+  overflow-x: auto;
+}
+pre code {
+  word-wrap: normal;
+  white-space: pre;
+}
+</style>
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+* ChIP-seq data using H3K36me3 antibody in Drosophila
+* 1 example dataset
+
+## Setup Annotation
+
+```{r message=FALSE, warning=FALSE,results=FALSE}
+library(HelpersforChIPSeq)
+
+### load gene annotation
+library(TxDb.Dmelanogaster.UCSC.dm6.ensGene)
+
+txdb <- TxDb.Dmelanogaster.UCSC.dm6.ensGene
+my_genes <- genes(txdb)
+
+my_coordinates <- data.frame(chr = seqnames(my_genes),
+                             start = start(my_genes),
+                             end = end(my_genes),
+                             strand = strand(my_genes),
+                             width = width(my_genes),
+                             row.names = my_genes$gene_id)
+
+my_coordinates <- my_coordinates[my_coordinates$width > 1001,]
+my_coordinates <- my_coordinates[my_coordinates$width < 20001,]
+my_coordinates <- my_coordinates[my_coordinates$chr %in% "chr2L",]
+```
+
+```{r}
+head(my_coordinates)
+```
+
+
+
+## Load Example Data
+
+
+```{r message=FALSE, warning=FALSE,results=FALSE, eval=TRUE}
+### convert bedgraph to coverage vector
+data_dir <- system.file("extdata2/", package = "HelpersforChIPSeq")
+bedgraph_files <- file.path(data_dir, list.files(path = data_dir, pattern = ".bedgraph.gz$"))
+
+my_bedgraph <- rtracklayer::import(bedgraph_files[1])
+seqlevelsStyle(my_bedgraph) <- "UCSC"
+
+my_coverage <- coverage(my_bedgraph, weight = "score")
+my_coverage <- my_coverage[names(my_coverage) %in% "chr2L"]
+```
+
+```{r}
+my_coverage
+```
+
+
+## Coverage GeneBody Scaled Matrix
+
+
+```{r message=FALSE, warning=FALSE,results=FALSE, eval=TRUE}
+margin_outer = 500
+margin_inner = 0
+genebody_scaler = 1000
+
+### create matrix
+mat.H3K36me3 <- coverageGeneBodyScaled(my_coverage = my_coverage,
+                                       my_coordinates = my_coordinates,
+                                       margin_outer = margin_outer, 
+                                       margin_inner = margin_inner,
+                                       genebody_scaler = genebody_scaler)
+```
+
+
+
+## Composite Plot
+
+```{r message=FALSE, warning=FALSE,results=FALSE, fig.align='center', fig.height=5, fig.width=5, dpi=200, out.width='75%'}
+par(mfrow=c(1,1), mar = c(4,4,2,2), oma = c(1,1,1,1), mgp = c(2,1,0))
+
+# plot matrix (input is a character vector with the name of the matrix)
+my_mat <- "mat.H3K36me3"
+
+plotComposite(my_sample_mats = my_mat, 
+              my_sub_range = 1:ncol(get(my_mat)), 
+              ylims =  c(0.5,2.5), 
+              my_binning = 1, 
+              my_colors_composite = "#0072B2", 
+              my_title = gsub("mat.","",my_mat),
+              add_range = NULL, 
+              smoother = 31, 
+              line_lwd = 2, 
+              add_axis = FALSE)  
+
+mtext(text = "ChIP / Input", side = 2, line = 2.5)
+
+#  add axis (extra function for gene body scaled matrix)
+axisGeneBodyScaled(margin_outer = margin_outer,
+                   margin_inner = margin_inner,
+                   genebody_scaler = genebody_scaler,
+                   add_line = TRUE)
+```
+
+
+
+```{r message=FALSE, warning=FALSE,results=FALSE, fig.align='center', fig.height=5, fig.width=5, dpi=200, out.width='75%'}
+# change inner margins
+margin_outer = 500
+margin_inner = 500
+genebody_scaler = 1000
+
+mat.H3K36me3 <- coverageGeneBodyScaled(my_coverage = my_coverage,
+                                       my_coordinates = my_coordinates,
+                                       margin_outer = margin_outer, 
+                                       margin_inner = margin_inner,
+                                       genebody_scaler = genebody_scaler)
+```
+
+
+
+```{r message=FALSE, warning=FALSE,results=FALSE, fig.align='center', fig.height=5, fig.width=5, dpi=200, out.width='75%'}
+par(mfrow=c(1,1), mar = c(4,4,2,2), oma = c(1,1,1,1), mgp = c(2,1,0))
+
+# plot matrix
+my_mat <- "mat.H3K36me3"
+
+plotComposite(my_sample_mats = my_mat, 
+              my_sub_range = 1:ncol(get(my_mat)), 
+              ylims =  c(0.5,2.5), 
+              my_binning = 1, 
+              my_colors_composite = "#0072B2", 
+              my_title = gsub("mat.","",my_mat),
+              add_range = NULL, 
+              smoother = 51, 
+              line_lwd = 2, 
+              add_axis = FALSE)  
+
+mtext(text = "ChIP / Input", side = 2, line = 2.5)
+
+#  add axis
+axisGeneBodyScaled(margin_outer = margin_outer,
+                   margin_inner = margin_inner,
+                   genebody_scaler = genebody_scaler,
+                   add_line = TRUE)
+```
+
+
+
+```{r}
+sessionInfo()
+```
+

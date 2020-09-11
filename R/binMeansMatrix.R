@@ -1,6 +1,6 @@
 #' binMeansMatrix
 #'
-#' calculate the mean of non-overlapping bins for each row in a matrix.
+#' calculates the mean of non-overlapping bins for each row in a matrix.
 #'
 #' @param my_mat input matrix.
 #' @param my_binning integer of bin size.

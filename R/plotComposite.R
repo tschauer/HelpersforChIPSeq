@@ -19,7 +19,8 @@ plotComposite <- function(my_sample_mats,
                           line_lwd = 2,
                           smoother = 11,
                           log_scale = FALSE,
-                          add_range = c(NULL, "SD","SEM", "CI","IQR")){
+                          add_range = c(NULL, "SD","SEM", "CI","IQR"),
+                          add_axis = TRUE){
 
 
         x_range <- ncol(get(my_sample_mats[1])[,my_sub_range])
@@ -33,11 +34,14 @@ plotComposite <- function(my_sample_mats,
         #abline(h=1)
 
 
-        axis(side = 1, at = seq(1, x_range , length.out = 3),
-             labels =  c( paste("-",round((x_range/2)*my_binning/1000), "kb", sep="") ,
-                          site_label,
-                          paste("+",round((x_range/2)*my_binning/1000), "kb", sep=""))
-        )
+        if(add_axis){
+                axis(side = 1, at = seq(1, x_range , length.out = 3),
+                     labels =  c( paste("-",round((x_range/2)*my_binning/1000), "kb", sep="") ,
+                                  site_label,
+                                  paste("+",round((x_range/2)*my_binning/1000), "kb", sep=""))
+                )
+        }
+
 
         # axis(side = 1, at = c(250, 1000, 1750), labels = c("-750", "0", "+750"))
 
