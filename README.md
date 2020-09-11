@@ -13,6 +13,8 @@ install_github("tschauer/HelpersforChIPSeq")
 
 [**Heatmaps**](https://htmlpreview.github.io/?https://github.com/tschauer/HelpersforChIPSeq/blob/master/doc/ChIPseq_Heatmaps.html)
 
+[**GeneBody Scaled Composite Plots**](https://htmlpreview.github.io/?https://github.com/tschauer/HelpersforChIPSeq/blob/master/doc/ChIPseq_GeneBody_Scaled.html)
+
 
 ### Tutorials
 
