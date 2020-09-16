@@ -15,13 +15,13 @@ install_github("tschauer/HelpersforChIPSeq")
 
 [**GeneBody Scaled Composite Plots**](https://htmlpreview.github.io/?https://github.com/tschauer/HelpersforChIPSeq/blob/master/doc/ChIPseq_GeneBody_Scaled.html)
 
-[**Venn Diagram of Peak Overlaps**](https://htmlpreview.github.io/?https://github.com/tschauer/HelpersforChIPSeq/blob/master/doc/ChIPseq_Peak_Overlap.html)
+[**Venn Diagram of Peak Overlaps**](https://htmlpreview.github.io/?https://github.com/tschauer/HelpersforChIPSeq/blob/master/doc/ChIPseq_Peak_Overlaps.html)
 
 ### Tutorials
 
 [**Working with Centered Coverage Matrices**](https://htmlpreview.github.io/?https://github.com/tschauer/HelpersforChIPSeq/blob/master/doc/Coverage_Matrices.html)
 
-[**Peak Overlaps Tutorial**](https://htmlpreview.github.io/?https://github.com/tschauer/HelpersforChIPSeq/blob/master/doc/ChIPseq_Peak_Overlap_Tutorial.html)
+[**Peak Overlaps Tutorial**](https://htmlpreview.github.io/?https://github.com/tschauer/HelpersforChIPSeq/blob/master/doc/ChIPseq_Peak_Overlaps_Tutorial.html)
 
 
 ### Note
