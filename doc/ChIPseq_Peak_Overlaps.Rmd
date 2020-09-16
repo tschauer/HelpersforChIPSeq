@@ -50,7 +50,7 @@ my_promoters
 ```
 
 
-## Load Example Data
+## Load Data
 
 
 ```{r message=FALSE, warning=FALSE,results=FALSE, eval=TRUE}
@@ -79,7 +79,14 @@ ranges_rep2
 ```{r message=FALSE, warning=FALSE,results=FALSE, echo=FALSE, fig.align='center', fig.height=5, fig.width=9, dpi=200, out.width='75%'}
 cbPalette <- c("#E69F00", "#56B4E9", "#999999", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
 
-my_granges_names = c("ranges_rep1","ranges_rep2")
+my_region <- makeGRangesFromDataFrame(data.frame(chr = "chr2L", 
+                                                 start = 10714000, 
+                                                 end = 10748000))
+
+ranges_rep1_region <- subsetByOverlaps(ranges_rep1, my_region)
+ranges_rep2_region <- subsetByOverlaps(ranges_rep2, my_region)
+
+my_granges_names = c("ranges_rep1_region","ranges_rep2_region")
 
 my_pooled_ranges <- GenomicRanges::GRanges()
 
@@ -101,30 +108,27 @@ for(i in seq_along(my_granges_names)){
 
 par(mfrow=c(6,1),mar = c(1,3,1,3))
 
-my_region <- makeGRangesFromDataFrame(data.frame(chr = "chr2L", 
-                                                 start = 10714000, 
-                                                 end = 10748000))
 
-plotRanges(ranges_rep1, 
+plotRanges(ranges_rep1_region, 
            my_region = my_region, 
            my_title = "ranges #1 (n=6)", my_color = cbPalette[1])
 
-plotRanges(ranges_rep2,  
+plotRanges(ranges_rep2_region,  
            my_region = my_region, 
            my_title = "ranges #2 (n=4)", my_color = cbPalette[2])
 
 plotRanges(my_pooled_ranges,  my_region = my_region,  
            my_title = "pool (n=6)", my_color = cbPalette[3])
 
-plotRanges(my_pooled_ranges[my_pooled_ranges$ranges_rep1 & my_pooled_ranges$ranges_rep2],
+plotRanges(my_pooled_ranges[my_pooled_ranges$ranges_rep1_region & my_pooled_ranges$ranges_rep2_region],
            my_region = my_region, 
            my_title = "overlap (n=3)", my_color = cbPalette[7])
 
-plotRanges(my_pooled_ranges[my_pooled_ranges$ranges_rep1 & !(my_pooled_ranges$ranges_rep2)], 
+plotRanges(my_pooled_ranges[my_pooled_ranges$ranges_rep1_region & !(my_pooled_ranges$ranges_rep2_region)], 
            my_region = my_region, 
            my_title = "no overlap #1 (n=2)", my_color = cbPalette[1])
 
-plotRanges(my_pooled_ranges[my_pooled_ranges$ranges_rep2 & !(my_pooled_ranges$ranges_rep1)], 
+plotRanges(my_pooled_ranges[my_pooled_ranges$ranges_rep2_region & !(my_pooled_ranges$ranges_rep1_region)], 
            my_region = my_region, 
            my_title = "no overlap #2 (n=1)", my_color = cbPalette[2])
 
@@ -133,9 +137,21 @@ plot.new()
 abline(h = c(4/6,3/6), lty=2)
 ```
 
-* See details here ...
+
+
+* See details in this [tutorial](https://htmlpreview.github.io/?https://github.com/tschauer/HelpersforChIPSeq/blob/master/doc/ChIPseq_Peak_Overlaps_Tutorial.html)
 
 ## Venn diagrams
+
+#### Example
+
+```{r message=FALSE, warning=FALSE,results=FALSE, echo=FALSE, fig.align='center', fig.height=6, fig.width=6, dpi=200, out.width='75%'}
+plotVennOverlaps(my_granges_names = c("ranges_rep1_region","ranges_rep2_region"),
+                 my_labels = c("rep #1", "rep #2"),
+                 my_venn_colors = cbPalette)
+```
+
+#### Real data
 
 ```{r message=FALSE, warning=FALSE,results=FALSE, fig.align='center', fig.height=6, fig.width=6, dpi=200, out.width='75%'}
 cbPalette <- c("#E69F00", "#56B4E9", "#CC79A7", "#009E73", "#F0E442", "#0072B2", "#D55E00")
