@@ -1,0 +1,193 @@
+---
+title: "ChIPseq Peak Overlaps Tutorial"
+author: "Tamas Schauer"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{ChIPseq Peak Overlaps Tutorial}
+  \usepackage[utf8]{inputenc}
+  %\VignetteEngine{knitr::rmarkdown}
+editor_options: 
+  chunk_output_type: inline
+---
+
+<style>
+pre {
+  overflow-x: auto;
+}
+pre code {
+  word-wrap: normal;
+  white-space: pre;
+}
+</style>
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Overlap Counting Rules
+
+* define a pooled set of ranges
+* overlap: subset of pool overlapping both ranges
+* no overlap: subset of pool overlapping only one of the ranges
+
+
+```{r}
+
+```
+
+```{r message=FALSE, warning=FALSE,results=FALSE, eval=TRUE}
+library(HelpersforChIPSeq)
+library(GenomicRanges)
+```
+
+```{r message=FALSE, warning=FALSE,results=FALSE, eval=TRUE}
+# example genomic ranges
+gr1 <- makeGRangesFromDataFrame(data.frame(chr = "I",
+                                           start = c(1,3,4,11,13,22,42,44,46,50),
+                                           end =   c(2,4,6,12,15,23,43,45,49,51)))
+
+gr2 <- makeGRangesFromDataFrame(data.frame(chr = "I",
+                                           start = c(11,17,31,36,44,46),
+                                           end =   c(14,21,35,37,45,52)))
+
+
+gr3 <- makeGRangesFromDataFrame(data.frame(chr = "I",
+                                           start = c(8,13,16,32,39,41,47),
+                                           end =   c(10,14,19,34,40,43,51)))
+```
+
+
+```{r}
+gr1
+```
+
+```{r}
+gr2
+```
+
+```{r}
+gr3
+```
+
+```{r message=FALSE, warning=FALSE,results=FALSE, eval=TRUE}
+my_granges_names = c("gr1","gr2","gr3")
+
+# pool ranges
+my_pooled_ranges <- GenomicRanges::GRanges()
+
+for(i in seq_along(my_granges_names)){
+        my_pooled_ranges <- append(my_pooled_ranges, get(my_granges_names[i]))
+}
+
+# merge ranges
+my_pooled_ranges <- reduce(my_pooled_ranges,
+                           min.gapwidth = 0L,
+                           ignore.strand = TRUE)
+
+# check for overlaps with the pool
+for(i in seq_along(my_granges_names)){
+        
+        my_overlaps <- !(is.na(findOverlaps(my_pooled_ranges, get(my_granges_names[i]), select="arbitrary")))
+        mcols(my_pooled_ranges) <- cbind(mcols(my_pooled_ranges), my_overlaps)
+        colnames(mcols(my_pooled_ranges))[i] <- my_granges_names[i]
+}
+```
+
+```{r}
+my_pooled_ranges
+```
+
+```{r message=FALSE, warning=FALSE,results=FALSE, echo=TRUE, fig.align='center', fig.height=8, fig.width=10, dpi=200, out.width='75%'}
+my_region <- makeGRangesFromDataFrame(data.frame(chr = "I",start = -25, end = 75))
+
+# plot ranges
+par(mfrow=c(11,1),mar = c(1,3,1,3))
+
+plotRanges(my_ranges = gr1, my_region = my_region, my_border = "#E69F00",  
+           my_title = "gr1", my_color = "white")
+
+plotRanges(my_ranges = gr2, my_region = my_region, my_border = "#56B4E9",  
+           my_title = "gr2", my_color = "white")
+
+plotRanges(my_ranges = gr3, my_region = my_region, my_border = "#009E73",  
+           my_title = "gr3", my_color = "white")
+
+plotRanges(my_ranges = my_pooled_ranges, my_region = my_region, 
+           my_title = "pool", my_color = "#999999")
+
+plotRanges(my_pooled_ranges[my_pooled_ranges$gr1 & my_pooled_ranges$gr2 & my_pooled_ranges$gr3],
+           my_region = my_region, my_title = "overlap (gr1,gr2,gr3)", my_color = "#D55E00")
+
+plotRanges(my_pooled_ranges[my_pooled_ranges$gr1 & my_pooled_ranges$gr2 & !my_pooled_ranges$gr3],
+           my_region = my_region, my_title = "overlap (gr1,gr2)", my_color = "#CC79A7")
+
+plotRanges(my_pooled_ranges[my_pooled_ranges$gr1 & !my_pooled_ranges$gr2 & my_pooled_ranges$gr3],
+           my_region = my_region, my_title = "overlap (gr1,gr3)", my_color = "#CC79A7")
+
+plotRanges(my_pooled_ranges[!my_pooled_ranges$gr1 & my_pooled_ranges$gr2 & my_pooled_ranges$gr3],
+           my_region = my_region, my_title = "overlap (gr2,gr3)", my_color = "#CC79A7")
+
+
+plotRanges(my_pooled_ranges[my_pooled_ranges$gr1 & !my_pooled_ranges$gr2 & !my_pooled_ranges$gr3],
+           my_region = my_region, my_title = "gr1 only", my_color = "#E69F00")
+
+plotRanges(my_pooled_ranges[!my_pooled_ranges$gr1 & my_pooled_ranges$gr2 & !my_pooled_ranges$gr3],
+           my_region = my_region, my_title = "gr2 only", my_color = "#56B4E9")
+
+plotRanges(my_pooled_ranges[!my_pooled_ranges$gr1 & !my_pooled_ranges$gr2 & my_pooled_ranges$gr3],
+           my_region = my_region, my_title = "gr3 only", my_color = "#009E73")
+
+par(fig=c(0,1,0,1), mar=c(0,0,0,0), oma=c(0,0,0,0), new=TRUE)
+plot.new()
+abline(h = c(7/11,8.25/11), lty=2)
+```
+
+
+
+```{r message=FALSE, warning=FALSE,results=FALSE, echo=TRUE, fig.align='center', fig.height=8, fig.width=8, dpi=200, out.width='75%'}
+library(Vennerable)
+
+# plot Venn diagram
+plotVennOverlaps(my_granges_names = my_granges_names,
+                 my_labels = my_granges_names,
+                 my_venn_colors = c("#E69F00", "#56B4E9", "#009E73"))
+
+
+```
+
+
+
+```{r message=FALSE, warning=FALSE,results=FALSE, echo=TRUE, fig.align='center', fig.height=8, fig.width=8, dpi=200, out.width='75%'}
+library(ChIPpeakAnno)
+
+# compare to other package
+ol <- findOverlapsOfPeaks(gr1,gr2,gr3,
+                          connectedPeaks="merge")
+
+# Note difference to pooling method
+# default not proportional
+makeVennDiagram(ol, connectedPeaks="merge",
+                lwd = 5, cex = 2, cat.cex = 2,
+                col = c("#E69F00", "#56B4E9", "#009E73"),
+                cat.col = c("#E69F00", "#56B4E9", "#009E73"))
+```
+
+```{r message=FALSE, warning=FALSE,results=FALSE, echo=TRUE, fig.align='center', fig.height=8, fig.width=8, dpi=200, out.width='75%'}
+# merge adjacent ranges in gr1 using reduce
+gr1 <- reduce(gr1, min.gapwidth = 0L)
+
+ol <- findOverlapsOfPeaks(gr1,gr2,gr3,
+                          connectedPeaks="merge")
+
+# get the same result as the pooling method
+makeVennDiagram(ol, connectedPeaks="merge",
+                lwd = 5, cex = 2, cat.cex = 2,
+                col = c("#E69F00", "#56B4E9", "#009E73"),
+                cat.col = c("#E69F00", "#56B4E9", "#009E73"))
+```
+
+```{r}
+sessionInfo()
+```
+
