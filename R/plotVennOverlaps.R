@@ -65,7 +65,7 @@ plotVennOverlaps <- function(my_granges_names,
 
 
         grid::grid.newpage()
-        Vennerable::plotplot(my_venn_plot, show = list(Faces = FALSE, Universe=FALSE), gp = gp)
+        Vennerable::plot(my_venn_plot, show = list(Faces = FALSE, Universe=FALSE), gp = gp)
 
 
 
