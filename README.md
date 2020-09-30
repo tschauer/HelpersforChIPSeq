@@ -1,6 +1,6 @@
 ## Helper functions for exploring and plotting ChIP-seq data
 
-## Prerequisites
+### Prerequisites
 
 * Bioconductor
 
@@ -26,7 +26,6 @@ install_github("musikutiv/tsTools")
 ```
 BiocManager::install(c("RBGL","graph"))
 install_github("js229/Vennerable")
-
 ```
 
 ### Installation
