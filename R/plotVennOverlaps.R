@@ -22,9 +22,9 @@ plotVennOverlaps <- function(my_granges_names,
                 my_pooled_ranges <- append(my_pooled_ranges, get(my_granges_names[i]))
         }
 
-        my_pooled_ranges <- reduce(my_pooled_ranges,
-                                   min.gapwidth = 0L,
-                                   ignore.strand = TRUE)
+        my_pooled_ranges <- GenomicRanges::reduce(my_pooled_ranges,
+                                                  min.gapwidth = 0L,
+                                                  ignore.strand = TRUE)
 
         my_pooled_ranges$range_id <- paste("range", seq_along(my_pooled_ranges), sep="_")
 
@@ -32,7 +32,7 @@ plotVennOverlaps <- function(my_granges_names,
 
         for(i in seq_along(my_granges_names)){
 
-                my_overlaps <- !(is.na(findOverlaps(my_pooled_ranges, get(my_granges_names[i]), select="arbitrary")))
+                my_overlaps <- !(is.na(GenomicRanges::findOverlaps(my_pooled_ranges, get(my_granges_names[i]), select="arbitrary")))
 
                 my_venn_list[[i]] <- my_pooled_ranges$range_id[my_overlaps]
 

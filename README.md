@@ -1,5 +1,34 @@
 ## Helper functions for exploring and plotting ChIP-seq data
 
+## Prerequisites
+
+* Bioconductor
+
+```
+if (!requireNamespace("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+BiocManager::install(version = "3.11")
+```
+
+* tsTools
+
+```
+BiocManager::install(c("GenomicRanges","IRange","HilbertVis"))
+
+install.packages("devtools")
+
+library(devtools)
+install_github("musikutiv/tsTools")
+```
+
+* Vennerable
+
+```
+BiocManager::install(c("RBGL","graph"))
+install_github("js229/Vennerable")
+
+```
+
 ### Installation
 
 ```
