@@ -12,8 +12,8 @@ countReadsOverGrangesInBAM(
   frag.min = 0,
   frag.max = 500,
   frag.length = 150,
-  frag.unique = c(NULL, "oneEND", "bothEND"),
-  subsampling = c(NULL, 1e+06)
+  frag.unique = c("allPAIRED", "oneEND", "bothEND"),
+  subsampling = FALSE
 )
 }
 \description{
