@@ -9,15 +9,21 @@
 countReadsOverGrangesInBAM <- function(my_ranges,
                                        bam_file,
                                        bam_type = c("SINGLE","PAIRED"),
-                                       subsampling = NULL,
+                                       single_read.unique = FALSE,
                                        frag.min = 0,
                                        frag.max = 500,
-                                       frag.length = 150){
+                                       frag.length = 150,
+                                       frag.unique = c(NULL, "oneEND", "bothEND"),
+                                       subsampling = c(NULL, 1e6)){
 
         if(bam_type == "SINGLE"){
 
                 my_bam <- GenomicAlignments::readGAlignments(bam_file)
                 grs <- GenomicRanges::granges(my_bam)
+
+                if(single_read.unique){
+                        grs <- unique(grs)
+                }
 
                 if(!(is.null(subsampling))){
                         set.seed(111)
@@ -33,6 +39,21 @@ countReadsOverGrangesInBAM <- function(my_ranges,
 
                 my_bam <- GenomicAlignments::readGAlignmentPairs(bam_file)
                 grs <- GenomicRanges::granges(my_bam, on.discordant.seqnames="drop")
+
+                if(!(is.null(frag.unique))){
+
+                        if(frag.unique == "oneEND"){
+                                grs <- unique(grs)
+                        }
+
+                        if(frag.unique == "bothEND"){
+
+                                grs$frag_start <- paste(seqnames(grs), start(grs), sep="_")
+                                grs$frag_end <-   paste(seqnames(grs), end(grs),   sep="_")
+
+                                grs <- grs[!(duplicated(grs$frag_start)) & !(duplicated(grs$frag_end))]
+                        }
+                }
 
                 grs <- grs[GenomicRanges::width(grs) > frag.min & GenomicRanges::width(grs) < frag.max]
 

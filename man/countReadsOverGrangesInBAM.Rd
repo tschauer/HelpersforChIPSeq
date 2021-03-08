@@ -8,10 +8,12 @@ countReadsOverGrangesInBAM(
   my_ranges,
   bam_file,
   bam_type = c("SINGLE", "PAIRED"),
-  subsampling = NULL,
+  single_read.unique = FALSE,
   frag.min = 0,
   frag.max = 500,
-  frag.length = 150
+  frag.length = 150,
+  frag.unique = c(NULL, "oneEND", "bothEND"),
+  subsampling = c(NULL, 1e+06)
 )
 }
 \description{
