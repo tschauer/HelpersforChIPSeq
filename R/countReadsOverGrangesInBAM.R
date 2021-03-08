@@ -14,7 +14,7 @@ countReadsOverGrangesInBAM <- function(my_ranges,
                                        frag.max = 500,
                                        frag.length = 150,
                                        frag.unique = c("allPAIRED", "oneEND", "bothEND"),
-                                       subsampling = FALSE){
+                                       subsampling = 0){
 
         if(bam_type == "SINGLE"){
 
@@ -25,7 +25,7 @@ countReadsOverGrangesInBAM <- function(my_ranges,
                         grs <- unique(grs)
                 }
 
-                if(subsampling){
+                if(subsampling > 0){
                         set.seed(111)
                         grs <- grs[sample(length(grs), subsampling)]
                 }
@@ -58,7 +58,7 @@ countReadsOverGrangesInBAM <- function(my_ranges,
                 grs <- grs[GenomicRanges::width(grs) > frag.min & GenomicRanges::width(grs) < frag.max]
 
 
-                if(!(is.null(subsampling))){
+                if(subsampling > 0){
                         set.seed(111)
                         grs <- grs[sample(length(grs), subsampling)]
                 }
