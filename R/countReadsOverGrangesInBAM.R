@@ -37,6 +37,10 @@ countReadsOverGrangesInBAM <- function(my_ranges,
 
         } else if(bam_type == "PAIRED"){
 
+
+                stopifnot(frag.unique %in% c("allPAIRED", "oneEND", "bothEND"))
+
+
                 my_bam <- GenomicAlignments::readGAlignmentPairs(bam_file)
                 grs <- GenomicRanges::granges(my_bam, on.discordant.seqnames="drop")
 
