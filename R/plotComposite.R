@@ -19,6 +19,7 @@ plotComposite <- function(my_sample_mats,
                           line_lwd = 2,
                           smoother = 11,
                           log_scale = FALSE,
+                          min_max_scale = FALSE,
                           add_range = c(NULL, "SD","SEM", "CI","IQR"),
                           add_axis = TRUE){
 
@@ -59,6 +60,11 @@ plotComposite <- function(my_sample_mats,
                 y_data <- colMeans(my_sample_mat, na.rm = TRUE)
                 y_data <- zoo::rollmean(y_data, smoother)
 
+
+                if(min_max_scale){
+
+                        y_data <- (y_data - min(y_data, na.rm = TRUE))/(max(y_data, na.rm = TRUE) - min(y_data, na.rm = TRUE))
+                }
 
                 if(!(is.null(add_range))){
 
